@@ -20,7 +20,7 @@ param_names = {
 param_values = [
     radar.TX_freq(des_idx)
     MQ18.ALTITUDE/1000
-    rad2deg(psi_bore)
+    design.boresight
     antn.del
     antn.daz
     antn.rpm
@@ -48,16 +48,16 @@ metric_names = {
 };
 
 metric_values = [
-    swath/1000
+    metrics.swath/1000
     R_near
     R_bore
     R_far
     range_res
     az_res
-    POT
-    Pd_bore
-    TCN_dB
-    delta_fd_max
+    metrics.POT
+    metrics.Pd_bore
+    metrics.TCN_bore
+    0; %delta_fd_max
 ];
 
 T_metrics = table(metric_names, metric_values);

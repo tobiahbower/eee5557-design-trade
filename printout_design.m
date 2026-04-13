@@ -1,4 +1,4 @@
-clc;
+
 fprintf('\n============================================================\n');
 fprintf('              RADAR DESIGN PARAMETERS CHOICES\n');
 fprintf('============================================================\n');
@@ -6,7 +6,7 @@ fprintf('============================================================\n');
 fprintf('%-45s %-20s\n', 'Description', 'Proposed Value');
 fprintf('%s\n', repmat('-',1,70));
 
-fprintf('%-45s %-20s\n', '01. Radar Freq', sprintf('%.2f GHz', radar.TX_freq/1e9));
+fprintf('%-45s %-20s\n', '01. Radar Freq', sprintf('%.2f GHz', radar.TX_freq(des_idx)/1e9));
 
 fprintf('%-45s %-20s\n', '02. UAV Altitude', sprintf('%.2f km', MQ18.ALTITUDE/1000));
 
@@ -38,7 +38,7 @@ fprintf('%-45s %-20s\n', '13. PCR (>=1.0)', sprintf('%.2f', radar.PCR));
 fprintf('%-45s %-20s\n', '1. Fwd-look POT/scan used for detection', sprintf('%d #', 0));
 fprintf('%-45s %-20s\n', '2. worst case # scans on target = N', sprintf('%d', design.scans));
 fprintf('%-45s %-20s\n', '3. Doppler-mode PRF', sprintf('%.1f Hz', radar.PRF_doppler));
-fprintf('%-45s %-20s\n', '4. Xmtr duty cycle Doppler-mode', sprintf('%.1f Hz', radar.duty_cycle_doppler));
+fprintf('%-45s %-20s\n', '4. Xmtr duty cycle Doppler-mode', sprintf('%.1f Hz', radar.Tau_doppler));
 fprintf('%-45s %-20s\n', '5. (Tdetect/scan)/(TOT/scan)', sprintf('%.1f ratio', 0));
 
 
@@ -89,9 +89,9 @@ fprintf("%-55s %-20.2f pulses\n", "Pulses on target (POT)", round(metrics.POT));
 X = (radar.TX_power * antn.G^2 * radar.lambda^2) / ((4*pi)^3);
 fprintf("%-55s %-20.2f dB\n", "Radar equation constant X", 10*log10(X));
 
-fprintf("%-55s %-20.2f dB\n", "T/(C+N) @ boresight", 10*log10(TCN));
+fprintf("%-55s %-20.2f dB\n", "T/(C+N) @ boresight", results.tcn_power.TCN_dB(numel(results.tcn_power.TCN_dB)/2));
 
-fprintf("%-55s %-20.3f\n", "Pd @ boresight", Pd_bore);
+fprintf("%-55s %-20.3f\n", "Pd @ boresight", results.pd_psi.Pd(numel(results.pd_psi.Pd)/2));
 
 fd_max = (2 * airboat.MAX_SPEED) / radar.lambda;
 
@@ -99,7 +99,7 @@ fprintf("%-55s %-20.2f Hz\n", "Max Doppler @ boresight", fd_max);
 
 fprintf("%-55s %-20.6f sec\n", "Doppler TOT", metrics.TOT);
 
-fprintf("%-55s %-20.2f Hz\n", "Doppler precision", delta_fd_max);
+% fprintf("%-55s %-20.2f Hz\n", "Doppler precision", delta_fd_max);
 
 
 fprintf("\n\n================ SPECIFICATION COMPLIANCE MATRIX =====================\n");
@@ -111,10 +111,10 @@ fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
     "Transmit Power (W)", radar.TX_power, 1500, 1500 - radar.TX_power);
 
 fprintf("%-45s %-15.3f %-15.3f %-15.3f\n", ...
-    "Duty Cycle (Detect)", radar.duty_cycle, 0.10, 0.10 - radar.duty_cycle);
+    "Duty Cycle (Detect)", radar.Tau, 0.10, 0.10 - radar.Tau);
 
 fprintf("%-45s %-15.3f %-15.3f %-15.3f\n", ...
-    "Duty Cycle (Doppler)", radar.duty_cycle, 0.20, 0.20 - radar.duty_cycle);
+    "Duty Cycle (Doppler)", radar.Tau, 0.20, 0.20 - radar.Tau);
 
 fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
     "Grazing Angle @ Far (deg)", rad2deg(psi_far), 2, rad2deg(psi_far) - 2);
@@ -132,7 +132,7 @@ fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
     "Spin Rate (rpm)", metrics.spin_rpm, 180, 180 - metrics.spin_rpm);
 
 fprintf("%-45s %-15d %-15d %-15d\n", ...
-    "Number of Scans", req.scans, 3, req.scans - 3);
+    "Number of Scans", design.scans, 3, design.scans - 3);
 
 fprintf("%-45s %-15.0f %-15.0f %-15.0f\n", ...
     "PRF (Hz)", radar.PRF, 5e5, 5e5 - radar.PRF);
@@ -146,10 +146,10 @@ fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
 Tspin = 60 / metrics.spin_rpm;
 
 fprintf("%-45s %-15.4f %-15.4f %-15.4f\n", ...
-    "Warning Time (sec)", metrics.TOT, 6, metrics.TOT - 6);
+    "Warning Time (sec)", metrics.twarn, 6, metrics.twarn - 6);
 
 fprintf("%-45s %-15.3f %-15.3f %-15.3f\n", ...
-    "Pd (worst case)", Pd_far, 0.80, Pd_far - 0.80);
+    "Pd (worst case)", metrics.Pd_far, 0.80, metrics.Pd_far - 0.80);
 
-fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
-    "Doppler Precision (Hz)", delta_fd_max, 700, 700 - delta_fd_max);
+% fprintf("%-45s %-15.2f %-15.2f %-15.2f\n", ...
+%     "Doppler Precision (Hz)", delta_fd_max, 700, 700 - delta_fd_max);
