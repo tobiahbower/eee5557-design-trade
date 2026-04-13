@@ -394,17 +394,6 @@ end
 
 
 function fd = compute_doppler(V_UAV, V_target, az_target_deg, psi_deg, lambda)
-% Compute Doppler frequency
-% Inputs:
-%   V_UAV          : UAV speed (m/s) — 37.55 m/s from your base_design
-%   V_target       : Target speed (m/s)
-%   az_target_deg  : Target azimuth relative to radar look direction (deg)
-%                    0=head-on closing, 180=moving directly away
-%   psi_deg        : Grazing angle (deg)
-%   lambda         : Wavelength (m)
-% Output:
-%   fd             : Doppler frequency (Hz)
-
     psi = deg2rad(psi_deg);
     az  = deg2rad(az_target_deg);
 
