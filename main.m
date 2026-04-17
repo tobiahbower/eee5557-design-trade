@@ -40,9 +40,9 @@ function [const, radar, antn, MQ18, airboat, design, metrics, des_idx] = base_de
     radar.TX_freq = [37e9 90e9 150e9];
     radar.TX_power = 1500;
     radar.PRF = 5e5;
-    radar.Tau = 0.1e-6;
+    radar.Tau = 0.03e-6;
     radar.Tsys = [400 500 700];
-    radar.PCR = radar.Tau / 0.1e-6;
+    radar.PCR = radar.Tau / 0.03e-6;
     radar.TX_power_comp = radar.TX_power * radar.PCR;
     radar.Tfa = 100;                        % sec
     radar.Pfa = 1e-6;
@@ -50,8 +50,8 @@ function [const, radar, antn, MQ18, airboat, design, metrics, des_idx] = base_de
     radar.Tau_doppler = 0.5;
     radar.simul_detect = 'N';
 
-    antn.del = 0.75;
-    antn.daz = 0.75;
+    antn.del = 0.3;
+    antn.daz = 0.3;
     antn.aperture_eff = 0.6;
 
     radar.lambda = const.c / radar.TX_freq(des_idx);
@@ -63,7 +63,7 @@ function [const, radar, antn, MQ18, airboat, design, metrics, des_idx] = base_de
     antn.G = antn.aperture_eff * 4*pi / (antn.HPBW_Bel * antn.HPBW_Baz);
 
     design.scans = 3;
-    design.boresight = 25; % deg
+    design.boresight = 20; % deg
 
     airboat.MIN_SPEED = 50*1000/3600;
     airboat.MAX_SPEED = 170*1000/3600;
@@ -115,7 +115,11 @@ function [TCN_dB, TC_dB, TN_dB] = evaluate_point(radar, antn, const, R, psi, lam
     Pn = const.k * radar.Tsys(des_idx) * Bn;
     
     % === FIXED CLUTTER AREA ===
-    A_cell = R^2 * antn.HPBW_Baz * (antn.HPBW_Bel / sin(psi));   % <--- this was the bug
+    % A_cell = R^2 * antn.HPBW_Baz * (antn.HPBW_Bel / sin(psi));   % <--- this was the bug
+    % Range dimension of clutter cell: pulse-limited (correct)
+    delta_R = (const.c * radar.Tau) / 2;
+    R_cell  = min(delta_R, R * antn.HPBW_Bel / sin(psi));
+    A_cell  = R * antn.HPBW_Baz * R_cell;   % NOT R^2*HPBW_az*HPBW_el/sin
     
     Pc = (radar.TX_power_comp * antn.G^2 * lambda^2 * sigma_c * A_cell) / ((4*pi)^3 * R^4 * L);
     
