@@ -25,7 +25,7 @@ param_values = [
     antn.daz
     antn.rpm
     radar.scan_az
-    radar.TX_power
+    radar.TX_power_ours
     radar.Tau*1e6
     radar.PRF
     radar.PCR

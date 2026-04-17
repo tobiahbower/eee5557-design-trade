@@ -38,12 +38,13 @@ function [const, radar, antn, MQ18, airboat, design, metrics, des_idx] = base_de
 
     radar.scan_az = 30;
     radar.TX_freq = [37e9 90e9 150e9];
-    radar.TX_power = 1500;
+    radar.TX_power_ours = 450;
+    radar.TX_power = 450;
     radar.PRF = 5e5;
     radar.Tau = 0.03e-6;
     radar.Tsys = [400 500 700];
     radar.PCR = radar.Tau / 0.03e-6;
-    radar.TX_power_comp = radar.TX_power * radar.PCR;
+    radar.TX_power_comp = radar.TX_power_ours * radar.PCR;
     radar.Tfa = 100;                        % sec
     radar.Pfa = 1e-6;
     radar.PRF_doppler = 2e5; % Hz
@@ -180,7 +181,7 @@ function tbl = trade_power(const, radar, antn, MQ18, airboat, design, metrics, d
 end
 
 function tbl = trade_system(const, radar, antn, MQ18, airboat, design, metrics, des_idx)
-    PRFs = linspace(1e4,5e5,40);  psi = deg2rad(design.boresight);  h = MQ18.ALTITUDE;
+    PRFs = linspace(1e4,15e5,100);  psi = deg2rad(design.boresight);  h = MQ18.ALTITUDE;
     lambda = const.c / radar.TX_freq(des_idx);
     results = [];
     for prf = PRFs
